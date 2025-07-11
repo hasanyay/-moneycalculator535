@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title> Para Çevirici</title>
+  <link rel="stylesheet" href="sty.css">
+</head>
+<body>
+
+  <h1> Para Çevirici</h1>    
+  <div class="container">       
+    <label>Miktar:</label>       
+    <input type="number" id="miktar" placeholder="Örn: 100" />
+
+    <label>Gönderilen Para Birimi:</label>
+    <select id="kaynak">
+      <option value="USD">USD - Dolar</option>
+      <option value="TRY" selected>TRY - Türk Lirası</option>
+      <option value="EUR">EUR - Euro</option>
+      <option value="GBP">GBP - Sterlin</option>
+    </select>
+
+    <label>Çevrilecek Para Birimi:</label>
+    <select id="hedef">
+      <option value="USD">USD - Dolar</option>
+      <option value="TRY">TRY - Türk Lirası</option>
+      <option value="EUR" selected>EUR - Euro</option>
+      <option value="GBP">GBP - Sterlin</option>
+    </select>
+
+    <button onclick="cevir()">Çevir</button>
+
+    <div id="sonuc"></div>
+  </div>
+    <footer class="footer">
+    <p>Hasan Yay</p>
+    </footer>
+
+
+  <script>
+    async function cevir() {
+      const miktar = parseFloat(document.getElementById("miktar").value);
+      const kaynak = document.getElementById("kaynak").value;
+      const hedef = document.getElementById("hedef").value;
+      const sonucDiv = document.getElementById("sonuc");
+
+      if (isNaN(miktar) || miktar <= 0) {
+        sonucDiv.innerText = "Lütfen geçerli bir miktar giriniz.";
+        return;
+      }
+
+      if (kaynak === hedef) {
+        sonucDiv.innerText = "Aynı para birimi çevrilemez.";
+        return;
+      }
+
+      try {
+        const apiURL = `https://api.exchangerate-api.com/v4/latest/${kaynak}`;
+        const response = await fetch(apiURL);
+        const data = await response.json();
+        const oran = data.rates[hedef];
+        const sonuc = (miktar * oran).toFixed(2);
+
+        sonucDiv.innerText = `${miktar} ${kaynak} = ${sonuc} ${hedef}`;
+      } catch (error) {
+        sonucDiv.innerText = "Kur bilgileri alınamadı.";
+      }
+    }
+  </script>
+</body>
+</html>
